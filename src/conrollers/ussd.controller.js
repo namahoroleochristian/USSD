@@ -1,27 +1,31 @@
 export const HandleUSSDCall = async (req, res) => {
     try {
         const { sessionId, serviceCode, phoneNumber, text } = req.body;
-    
-        // Process the USSD request here
-        let response = "Welcome to our USSD service. Please enter your choice.";
-    
-        // Example logic based on user input
+        const inputs = text.split("*");
+        let response = "";
+
         if (text === "") {
-        response = "1. Register";
-        } else if (text === "1") {
-        response = "Lecome to the registration process. Please enter your name.";
-        } else if (text === "2") {
-        response = "already a member how great! Please enter your account number.";
-        } else if (text === "3") {
-        response = "Thank you for using our service. Goodbye!";
+            response = "CON Welcome to our USSD service.\n1. Register\n2. Login\n3. Exit";
+        } else if (inputs[0] === "1") {
+            if (inputs.length === 1) {
+                response = "CON Enter your name:";
+            } else if (inputs.length === 2) {
+                response = "CON Enter your age:";
+            } else {
+                response = `END Thank you ${inputs[1]}, age ${inputs[2]}! You are now registered.`;
+            }
+        } else if (inputs[0] === "2") {
+            response = "CON Enter your account number:";
+        } else if (inputs[0] === "3") {
+            response = "END Thank you for using our service. Goodbye!";
         } else {
-        response = "Invalid option. Please try again.";
+            response = "END Invalid option. Please try again.";
         }
-    
+
         res.set("Content-Type", "text/plain");
         res.send(response);
     } catch (error) {
         console.error("Error handling USSD call:", error);
-        res.status(500).send("An error occurred while processing your request.");
+        res.status(500).send("END An error occurred while processing your request.");
     }
-}
+};
